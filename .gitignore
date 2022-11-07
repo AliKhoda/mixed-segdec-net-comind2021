@@ -1,0 +1,8 @@
+*.pyc
+*.jpg
+*.bmp
+*.png
+*.csv
+*.ini
+results/*
+datasets/*/*.pyb
