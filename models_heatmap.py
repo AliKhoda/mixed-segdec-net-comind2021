@@ -56,6 +56,7 @@ class SegDecNet(nn.Module):
         super(SegDecNet, self).__init__()
         if input_width % 8 != 0 or input_height % 8 != 0:
             raise Exception(f"Input size must be divisible by 8! width={input_width}, height={input_height}")
+        self.neck_width = neck_width
         self.input_width = input_width
         self.input_height = input_height
         self.input_channels = input_channels
@@ -71,14 +72,14 @@ class SegDecNet(nn.Module):
                                     _conv_block(64, 64, 5, 2),
                                     _conv_block(64, 64, 5, 2),
                                     nn.MaxPool2d(2),
-                                    _conv_block(64, neck_width, 15, 7))
+                                    _conv_block(64, self.neck_width, 15, 7))
 
         self.seg_mask = nn.Sequential(
-            Conv2d_init(in_channels=neck_width, out_channels=1, kernel_size=1, padding=0, bias=False),
+            Conv2d_init(in_channels=self.neck_width, out_channels=1, kernel_size=1, padding=0, bias=False),
             FeatureNorm(num_features=1, eps=0.001, include_bias=False))
 
         self.extractor = nn.Sequential(nn.MaxPool2d(kernel_size=2),
-                                       _conv_block(in_chanels=neck_width+1, out_chanels=8, kernel_size=5, padding=2),
+                                       _conv_block(in_chanels=self.neck_width+1, out_chanels=8, kernel_size=5, padding=2),
                                        nn.MaxPool2d(kernel_size=2),
                                        _conv_block(in_chanels=8, out_chanels=16, kernel_size=5, padding=2),
                                        nn.MaxPool2d(kernel_size=2),
